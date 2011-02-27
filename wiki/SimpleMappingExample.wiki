@@ -29,11 +29,11 @@ The entity identifier represents the primary key that allows to retrieve
 an object from the database.  The identifier is specified by the *id* element as follows:
 
 {{{
-        <id name="id" type="ADO.Identifier" unsaved-value="0">
-            <comment>the user identifier</comment>
-            <column name="ID" not-null="true" unique="true" sql-type="BIGINT"/>
-            <generator class="sequence"/>
-        </id>
+  <id name="id" type="ADO.Identifier" unsaved-value="0">
+    <comment>the user identifier</comment>
+    <column name="ID" not-null="true" unique="true" sql-type="BIGINT"/>
+    <generator class="sequence"/>
+  </id>
 }}}
 
 The *name* attribute defines the name of the identifier.  The generator will generate a `Get_XXX` function and a `Set_XXX` procedure.  The identifier type is defined by the *type* attribute.  The ADO runtime only supports `ADO.Identifier` (to be used for integer based columns) and `String`.
@@ -49,36 +49,32 @@ The ADO runtime supports:
 
 == Optimistic Locking Property ==
 
+The ADO runtime provides a support for optimistic locking based on an object version number (timestamp optimistic locking is not supported).  To enable this mechanism you must declare a *version* element with a column name that will hold the object version.
+
 {{{
-        <version name="version" type="int" column="object_version"/>
+  <version name="version" type="int" column="object_version"/>
 }}}
 
 == Entity Properties ==
 
+Each entity property has to be declared by using the *property* specification.
+
 {{{
-        <property name="name">
-            <comment>the user name</comment>
-            <column name="NAME" not-null="false" unique="false" sql-type="VARCHAR(256)"/>
-            <type name="String"/>
-        </property>
-        <property name="email">
-            <comment>the user email</comment>
-            <column name="EMAIL" not-null="false" unique="false" sql-type="VARCHAR(256)"/>
-            <type name="String"/>
-        </property>
-        <property name="date">
-            <comment>the user registration date</comment>
-            <column name="DATE" not-null="false" unique="false" sql-type="VARCHAR(256)"/>
-            <type name="String"/>
-        </property>
-        <property name="description">
-            <comment>the user description</comment>
-            <column name="DESCRIPTION" not-null="false" unique="false" sql-type="VARCHAR(256)"/>
-            <type name="String"/>
-        </property>
-        <property name="status">
-            <comment>the user status</comment>
-            <column name="STATUS" not-null="false" unique="false" sql-type="Integer"/>
-            <type name="Integer"/>
-        </property>
+  <property name="name" type="String">
+    <comment>the user name</comment>
+    <column name="NAME" not-null="false" unique="false" sql-type="VARCHAR(256)"/>
+    <type name="String"/>
+  </property>
 }}}
+
+The *name* attribute indicates the property name.  The generator will use this name for the generation of the `Get_XXX` and `Set_XXX` accessors.
+
+The *type* attribute indicates the property type.
+
+The SQL column is represented by the *column* element.
+
+The Ada generator and runtime support the following types:
+
+  * *String*: mapped to Ada.Strings.Unbounded.Unbounded_String
+  * *Integer*: mapped to Integer
+  * *Time*: mapped to Ada.Calendar.Time
