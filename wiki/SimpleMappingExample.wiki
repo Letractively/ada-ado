@@ -79,9 +79,16 @@ The Ada generator and runtime support the following types:
   * *Integer*: mapped to Integer
   * *Time*: mapped to Ada.Calendar.Time
 
+== Generation ==
+
+The Ada files are generated from the hibernate mapping file with the command:
+
+{{{
+dbmapper -o samples/model samples/user.hbm.xml
+}}}
 
 == Links ==
 
-[http://code.google.com/p/ada-ado/source/browse/trunk/samples/user.xml user.hbm.xml]
+[http://code.google.com/p/ada-ado/source/browse/trunk/samples/user.hbm.xml user.hbm.xml]
 
 [http://code.google.com/p/ada-ado/source/browse/trunk/samples/model/samples-user-model.ads samples-user-model.ads] (Generated package specification)
