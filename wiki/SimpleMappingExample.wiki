@@ -78,3 +78,10 @@ The Ada generator and runtime support the following types:
   * *String*: mapped to Ada.Strings.Unbounded.Unbounded_String
   * *Integer*: mapped to Integer
   * *Time*: mapped to Ada.Calendar.Time
+
+
+== Links ==
+
+[http://code.google.com/p/ada-ado/source/browse/trunk/samples/user.xml user.hbm.xml]
+
+[http://code.google.com/p/ada-ado/source/browse/trunk/samples/model/samples-user-model.ads samples-user-model.ads] (Generated package specification)
