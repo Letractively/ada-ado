@@ -25,6 +25,9 @@ The *name* attribute indicates the Ada type name and the *table* attribute refer
 
 == Entity Identifier ==
 
+The entity identifier represents the primary key that allows to retrieve
+an object from the database.  The identifier is specified by the *id* element as follows:
+
 {{{
         <id name="id" type="ADO.Identifier" unsaved-value="0">
             <comment>the user identifier</comment>
@@ -32,6 +35,17 @@ The *name* attribute indicates the Ada type name and the *table* attribute refer
             <generator class="sequence"/>
         </id>
 }}}
+
+The *name* attribute defines the name of the identifier.  The generator will generate a `Get_XXX` function and a `Set_XXX` procedure.  The identifier type is defined by the *type* attribute.  The ADO runtime only supports `ADO.Identifier` (to be used for integer based columns) and `String`.
+
+The SQL column associated with the identifier is defined by the *name* attribute in the *column* element.  The *sql-type* attribute indicates the SQL type.
+
+The *generator* element defines how the identifier is allocated.
+The ADO runtime supports:
+
+  * *none*: the identifier is allocated by the application.
+  * *sequence*: the identifier is allocated by the database (auto-increment).
+  * *hilo*: the identifier is allocated by an efficient sequence generator.
 
 == Optimistic Locking Property ==
 
