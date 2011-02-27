@@ -1,0 +1,70 @@
+#summary Simple Mapping Example
+
+= Introduction =
+
+The XML mapping file defines how the SQL columns are mapped in the Ada record.
+From the XML mapping, the [http://code.google.com/p/ada-gen Ada Generator] will generate the package specification and body that will hold the Ada record declaration.
+
+The XML mapping definition comes from the [http://www.hibernate.org Hibernate] java framework.  The [http://docs.jboss.org/hibernate/core/3.6/reference/en-US/html/mapping.html Hibernate Mapping] documentation gives the details of the mapping.  The Ada ADO runtime and Ada Generator only support a subset of Hibernate mapping.
+
+== Entity Declaration ==
+
+The entity declaration is defined by the *class* element in the XML file:
+{{{
+<?xml version="1.0" encoding="UTF-8"?>
+<hibernate-mapping default-cascade="none">
+    <class name="Samples.User.Model.User_Ref"
+           table="user">
+        <comment>Record representing a user</comment>
+        ...
+    </class>
+</hibernate-mapping>
+}}}
+
+The *name* attribute indicates the Ada type name and the *table* attribute refers to the database table name.  The Ada type name also specifies the package name (the `User_Ref` tagged record in the `Samples.User.Model` package).
+
+== Entity Identifier ==
+
+{{{
+        <id name="id" type="ADO.Identifier" unsaved-value="0">
+            <comment>the user identifier</comment>
+            <column name="ID" not-null="true" unique="true" sql-type="BIGINT"/>
+            <generator class="sequence"/>
+        </id>
+}}}
+
+== Optimistic Locking Property ==
+
+{{{
+        <version name="version" type="int" column="object_version"/>
+}}}
+
+== Entity Properties ==
+
+{{{
+        <property name="name">
+            <comment>the user name</comment>
+            <column name="NAME" not-null="false" unique="false" sql-type="VARCHAR(256)"/>
+            <type name="String"/>
+        </property>
+        <property name="email">
+            <comment>the user email</comment>
+            <column name="EMAIL" not-null="false" unique="false" sql-type="VARCHAR(256)"/>
+            <type name="String"/>
+        </property>
+        <property name="date">
+            <comment>the user registration date</comment>
+            <column name="DATE" not-null="false" unique="false" sql-type="VARCHAR(256)"/>
+            <type name="String"/>
+        </property>
+        <property name="description">
+            <comment>the user description</comment>
+            <column name="DESCRIPTION" not-null="false" unique="false" sql-type="VARCHAR(256)"/>
+            <type name="String"/>
+        </property>
+        <property name="status">
+            <comment>the user status</comment>
+            <column name="STATUS" not-null="false" unique="false" sql-type="Integer"/>
+            <type name="Integer"/>
+        </property>
+}}}
