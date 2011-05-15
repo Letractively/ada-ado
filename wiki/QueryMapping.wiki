@@ -1,13 +1,93 @@
-#summary Query Mapping
+#summary Database Query Mappings
 
 = Introduction =
 
-Add your content here.
+Ada Database Objects provides a small framework which helps in
+using complex SQL queries in an application.  
+externalize the possibly complex SQL requests of an application
+in an external file and map the result of those queries directly in
+an Ada record.  The benefit of this mechanism are the following:
+
+* It is easy to change or tune an SQL query without re-building the application
+* Get the result of SQL queries directly in Ada records
+* Write an application that does not depend on the database
 
 
-= Details =
+* The XML query file defines a mapping that represents the result of SQL queries,
+* The XML mapping is used by [http://code.google.com/p/ada-gen Dynamo] to generate an Ada record,
+* The XML query file also defines a set of SQL queries, each query being identified by a unique name,
+* The XML query file is read by the application to obtain the SQL query associated with a query name.
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+= XML Query File and Mapping =
+
+== XML Query File ==
+
+The XML query file must use the `query-mapping` root element.  It should
+define at most one `class` mapping and several `query` definitions.
+The `class` definition should come first before any `query` definition.
+{{{
+<query-mapping>
+   <class>...</class>
+   <query>...</query>
+</query-mapping>
+}}}
+
+== SQL Result Mapping ==
+
+The XML query mapping is very close to the database table mapping.
+The difference is that there is no need to specify and table name
+nor any SQL type.  The XML query mapping is used to build an Ada
+record that correspond to query results.  Unlike the database table mapping,
+the Ada record will not be tagged and its definition will expose all the record members directly.
+
+The following XML query mapping:
+
+{{{
+<query-mapping>
+   <class name='Samples.Model.User_Info'>
+      <property name="name" type="String">
+         <comment>the user name</comment>
+         <type name="String"/>
+      </property>
+      <property name="email" type="String">
+         <comment>the email address</comment>
+      </property>
+   </class>
+</query-mapping>
+}}}
+
+will generate the following Ada record:
+
+{{{
+package Samples.Model is
+   type User_Info is record
+     Name  : Unbounded_String;
+     Email : Unbounded_String;
+   end record;
+end Samples.Model;
+}}}
+
+The same query mapping can be used by different queries.
+
+== SQL Queries ==
+
+The XML query file defines a list of SQL queries that the application
+can use.  Each query is associated with a unique name.  The application
+will use that name to identify the SQL query to execute.  For each query,
+the file also describes the SQL query pattern that must be used for
+the query execution.
+
+
+{{{
+<query name='xxx' class='Samples.Model.User_Info'>
+   <sql driver='mysql'>
+      select u.name, u.email from user u
+   </sql>
+   <sql driver='sqlite'>
+      ...
+   </sql>
+   <sql-count driver='mysql'>
+      select count(*) from user u
+   </sql-count>
+</query>
+}}}
