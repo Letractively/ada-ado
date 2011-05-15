@@ -8,15 +8,15 @@ externalize the possibly complex SQL requests of an application
 in an external file and map the result of those queries directly in
 an Ada record.  The benefit of this mechanism are the following:
 
-* It is easy to change or tune an SQL query without re-building the application
-* Get the result of SQL queries directly in Ada records
-* Write an application that does not depend on the database
+  * It is easy to change or tune an SQL query without re-building the application
+  * Get the result of SQL queries directly in Ada records
+  * Write an application that does not depend on the database
 
 
-* The XML query file defines a mapping that represents the result of SQL queries,
-* The XML mapping is used by [http://code.google.com/p/ada-gen Dynamo] to generate an Ada record,
-* The XML query file also defines a set of SQL queries, each query being identified by a unique name,
-* The XML query file is read by the application to obtain the SQL query associated with a query name.
+  * The XML query file defines a mapping that represents the result of SQL queries,
+  * The XML mapping is used by [http://code.google.com/p/ada-gen Dynamo] to generate an Ada record,
+  * The XML query file also defines a set of SQL queries, each query being identified by a unique name,
+  * The XML query file is read by the application to obtain the SQL query associated with a query name.
 
 = XML Query File and Mapping =
 
