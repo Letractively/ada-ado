@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary Using ADO to save and load objects
 
 == Getting a Database Connection ==
 
