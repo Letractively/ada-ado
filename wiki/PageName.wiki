@@ -5,6 +5,8 @@
 To load or save the user object in the database, we need a database session 
 
 {{{
+with ADO.Sessions;
+...
   Session : ADO.Sessions.Session := Factory.Get_Session;
 }}}
 
@@ -40,8 +42,7 @@ The primary key can be obtained after the first `Save` with the following operat
 
 == Loading a database record ==
 
-Loading a database record is quite easy and the ADO framework proposes two mechanisms.  First, let's declare our user
-variable:
+Loading a database record is quite easy and the ADO framework proposes two mechanisms.  First, let's declare our user variable:
 
 {{{
   Harry : User_Ref;
@@ -60,11 +61,13 @@ For this, we can create a query filter and use the `Find` operation.  To use a q
 first to declare a `Query` object:
 
 {{{
+with ADO.SQL;
+...
   Query : ADO.SQL.Query;
-}}]
+}}}
 
-On the query object, we have to define the filter which represents the condition and set the possible
-parameters used by the filter.
+On the query object, we have to define the filter which represents the
+condition and set the possible parameters used by the filter.
 
 {{{
   Query.Bind_Param (1, "Harry");
@@ -83,9 +86,13 @@ record to consider the object as found.
 
 == Getting a list of objects ==
 
-When several records have to be read, it is necessary to use the __List__ operation together with
+When several records have to be read, it is necessary to use the `List` operation together with
 a vector object.
 
 {{{
   Users : User_Vector;
+}}}
+
+{{{
+  List (Users, DB, Query);
 }}}
