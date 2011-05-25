@@ -43,6 +43,7 @@ Let's define a mapping for a simple `user` table and save it in `db/user.hbm.xml
 </hibernate-mapping>
 }}}
 
+The details of the XML mapping is described in SimpleMappingExample.
 
 == Generating the Ada model ==
 
