@@ -60,8 +60,9 @@ clear that these files are model files that are generated.
 
 == Getting a Database Connection ==
 
-To access the database, we will need a database connection represented
-by a session ADO object.
+To access the database, we will need a database connection.
+These connections are obtained from a factory and they are represented
+by a session object.
 
 === Session Factory ===
 
@@ -93,13 +94,22 @@ And to use an SQLite database, you could use:
    ADO.Sessions.Factory.Create (Factory, "sqlite:///tests.db");
 }}}
 
+Factory initialization is done once when an application starts.  The same
+factory object can be used by multiple threads.
 
 === Opening a Session ===
 
-The session is created by using the `Get_Session` function of the factory.
-The session is associated with a database connection.
+The session is created by using the `Get_Session` or the `Get_Master_Session`
+function of the factory.  Both function return a session object
+associated with a database connection.  The `Get_Session` will return
+a `Session` object which is intended to provide read-only access to the
+database.  The `Get_Master_session` returns a `Master_Session` object
+which provides a read-write access to the database.
 
-To load or save the user object in the database, we need a database session 
+In a typical MySQL Master/Slave replication, the `Master_Session` will refer
+to a connection to the MySQL master while the `Session` will refer to slave.
+
+To load or save the user object in the database, we need a `Master_Session`  database connection:
 
 {{{
 with ADO.Sessions;
