@@ -58,8 +58,46 @@ The generator will build the package specification and body for
 `Samples.User.Model`.  The files are created in `src/model` to make it
 clear that these files are model files that are generated.
 
-
 == Getting a Database Connection ==
+
+To access the database, we will need a database connection represented
+by a session ADO object.
+
+=== Session Factory ===
+
+The session factory is the entry point to obtain a database session.
+
+{{{
+with ADO.Sessions;
+with ADO.Sessions.Factory;
+   ...
+   Factory : ADO.Sessions.Factory.Session_Factory;
+}}}
+
+=== Factory Initialization ===
+
+The factory can be initialized by giving a URI string that identifies the
+driver and the information to connect to the database.  Once created,
+the factory return session objects to connect to that database.  To connect
+to another database, another factory is necessary.
+
+To get access to a MySQL database, the factory could be initialized as follows:
+
+{{{
+   ADO.Sessions.Factory.Create (Factory, "mysql://localhost:3306/ado_test?user=test");
+}}}
+
+And to use an SQLite database, you could use:
+
+{{{
+   ADO.Sessions.Factory.Create (Factory, "sqlite:///tests.db");
+}}}
+
+
+=== Opening a Session ===
+
+The session is created by using the `Get_Session` function of the factory.
+The session is associated with a database connection.
 
 To load or save the user object in the database, we need a database session 
 
