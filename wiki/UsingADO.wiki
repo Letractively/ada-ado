@@ -1,5 +1,50 @@
 #summary Using ADO to save and load objects
 
+== Introduction ==
+
+This small tutorial explains how an application can access
+a database (MySQL or SQLite) to store its data by using the
+Ada Database Objects framework.  This framework has several similarities
+with the excellent Java framework [http://www.hibernate.org/ Hibernate].
+
+The ADO framework is composed of:
+  * A code generator provided by [http://code.google.com/p/ada-gen Dynamo],
+  * A core runtime
+  * A set of database drivers (MySQL, SQLite).
+
+== Defining the data model ==
+
+The first step is to design the data model.  For this we will write
+a XML mapping file that describes the data table as well as how the different
+columns are mapped to an Ada type.  ADO uses (almost) the same mapping
+definition as [http://www.hibernate.org/ Hibernate].  Modeling tools such as
+[http://www.andromda.org AndroMDA] are able to generate these files from UML models.
+
+Let's define a mapping for a simple `user` table:
+{{{
+<hibernate-mapping>
+  <class name="Samples.User.Model.User"
+           table="user">
+    <comment>Record representing a user</comment>
+    <id name="id" type="ADO.Identifier">
+       <comment>the user identifier</comment>
+       <column name="ID" not-null="true" unique="true" sql-type="BIGINT"/>
+       <generator class="sequence"/>
+    </id>
+    <version name="version" type="int" column="object_version"/>
+    <property name="name" type="String">
+        <comment>the user name</comment>
+        <column name="NAME" not-null="false" unique="false" sql-type="VARCHAR(256)"/>
+    </property>
+    <property name="date" type="String">
+        <comment>the user registration date</comment>
+        <column name="DATE" not-null="false" unique="false" sql-type="VARCHAR(256)"/>
+    </property>
+    </class>
+</hibernate-mapping>
+}}}
+
+
 == Getting a Database Connection ==
 
 To load or save the user object in the database, we need a database session 
@@ -48,7 +93,7 @@ Loading a database record is quite easy and the ADO framework proposes two mecha
   Harry : User_Ref;
 }}}
 
-Then we can load the user record from the primary key identifier (assuming the identifier is ''23'':
+Then we can load the user record from the primary key identifier (assuming the identifier is ''23''):
 
 {{{
   Harry.Load (Session, 23);
@@ -77,6 +122,8 @@ condition and set the possible parameters used by the filter.
 Once the query is defined and initialized, we can find the database record:
 
 {{{
+  Found : Boolean;
+...
   User.Find (Session, Query, Found);
 }}}
 
@@ -93,6 +140,9 @@ a vector object.
   Users : User_Vector;
 }}}
 
+The `List` operation gets the vector object, the database session
+and the query filter.  If the vector contained some elements, they
+are removed and replaced by the query result.
 {{{
-  List (Users, DB, Query);
+  List (Users, Session, Query);
 }}}
