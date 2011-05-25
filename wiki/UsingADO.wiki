@@ -107,7 +107,7 @@ database.  The `Get_Master_session` returns a `Master_Session` object
 which provides a read-write access to the database.
 
 In a typical MySQL Master/Slave replication, the `Master_Session` will refer
-to a connection to the MySQL master while the `Session` will refer to slave.
+to a connection to the MySQL master while the `Session` will refer to a slave.
 
 To load or save the user object in the database, we need a `Master_Session`  database connection:
 
@@ -120,7 +120,9 @@ with ADO.Sessions;
 
 == Creating a database record ==
 
-First, we will declare a variable that will represent the new database record.  The `User_Ref` represents such record.
+To create our first database record, we will declare a variable that will represent the new database record.  The `User_Ref` represents a reference
+to such record.
+
 {{{
   User : User_Ref
 }}}
