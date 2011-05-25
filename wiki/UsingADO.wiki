@@ -104,7 +104,7 @@ To load or save the user object in the database, we need a database session
 {{{
 with ADO.Sessions;
 ...
-  Session : ADO.Sessions.Session := Factory.Get_Session;
+  Session : ADO.Sessions.Master_Session := Factory.Get_Master_Session;
 }}}
 
 
@@ -198,3 +198,8 @@ are removed and replaced by the query result.
 {{{
   List (Users, Session, Query);
 }}}
+
+== References ==
+
+
+[http://code.google.com/p/ada-ado/source/browse/trunk/samples/add_user.adb add_user.adb]
