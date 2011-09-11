@@ -1,0 +1,177 @@
+# You may edit this makefile as long as you keep these original 
+# target names defined.
+MODE=debug
+GNATMAKE=gnatmake -XMODE=${MODE} -XPROCESSORS=4
+GNATCLEAN=gnatclean
+GPRPATH=ado.gpr
+SVN=svn
+
+distdir=ada-ado-@ADO_VERSION@
+
+DIST_FILE=ada-ado-@ADO_VERSION@.tar.gz
+
+HAVE_MYSQL=@ADO_DB_MYSQL@
+HAVE_SQLITE=@ADO_DB_SQLITE@
+
+MYSQL_LIBNAME=@MYSQL_LIBNAME@
+
+MKDIR=mkdir
+CP=cp
+
+srcdir = .
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+top_builddir = .
+
+dynamodir=${prefix}/share/dynamo
+includedir=${prefix}/share/ada/adainclude
+projectdir=${prefix}/share/ada/adainclude
+libdir=${prefix}/lib
+alidir=${prefix}/share/ada/adainclude
+
+mysql_src_dir=${srcdir}/src/mysql
+sqlite_src_dir=${srcdir}/src/sqlite
+
+# Build executables for all mains defined by the project.
+build:  src/ado-drivers-initialize.adb src/mysql/mysql-lib.ads regtests/ado-testsuite-drivers.adb
+	$(GNATMAKE) -p -P "$(GPRPATH)"
+	$(GNATMAKE) -p -Ptests
+
+# Not intended for manual invocation.
+# Invoked if automatic builds are enabled.
+# Analyzes only on those sources that have changed.
+# Does not build executables.
+autobuild:
+	$(GNATMAKE) -gnatc -c -k  -P "$(GPRPATH)"
+
+# Configure the driver file
+src/ado-drivers-initialize.adb: src/ado-drivers-initialize.gpb Makefile
+	gnatprep -DHAVE_MYSQL=$(HAVE_MYSQL) \
+	          -DHAVE_SQLITE=$(HAVE_SQLITE) \
+		  src/ado-drivers-initialize.gpb $@
+
+src/mysql/mysql-lib.ads: src/mysql/mysql-lib.gpb Makefile
+	gnatprep -DMYSQL_LIB='"-l$(MYSQL_LIBNAME)"' src/mysql/mysql-lib.gpb $@
+
+regtests/ado-testsuite-drivers.adb: regtests/ado-testsuite-drivers.gpb Makefile
+	gnatprep -DHAVE_MYSQL=$(HAVE_MYSQL) \
+	         -DHAVE_SQLITE=$(HAVE_SQLITE) \
+		 regtests/ado-testsuite-drivers.gpb $@
+
+# Build and run the unit tests
+test:	test-sqlite test-mysql
+
+test-sqlite:		build regtests.db
+	test T${HAVE_SQLITE} = TFalse || \
+	bin/ado_harness -xml ado-sqlite-aunit.xml -config test-sqlite.properties
+
+test-mysql:		build create-mysql-tests
+	test T${HAVE_MYSQL} = TFalse || \
+	bin/ado_harness -xml ado-mysql-aunit.xml -config test-mysql.properties
+
+# Clean the root project of all build products.
+clean:
+	$(GNATCLEAN) -q -P "$(GPRPATH)"
+	$(GNATCLEAN) -q -Ptests
+	$(GNATCLEAN) -q -Psamples
+
+# Clean root project and all imported projects too.
+clean_tree:
+	$(GNATCLEAN) -P "$(GPRPATH)" -r
+
+# Check *all* sources for errors, even those not changed.
+# Does not build executables.
+analyze:
+	$(GNATMAKE) -f  -gnatc -c -k  -P "$(GPRPATH)"
+
+# Clean, then build executables for all mains defined by the project.
+rebuild: clean build
+
+GENERATOR=dynamo
+
+generate:
+	$(GENERATOR) generate db
+	$(GENERATOR) generate db/regtests
+	$(GENERATOR) generate db/samples
+
+# Create the test sqlite database
+regtests.db:
+	test T${HAVE_SQLITE} = TFalse || \
+	sqlite3 $@ < db/regtests/sqlite/create-ado-sqlite.sql
+
+# Create the samples sqlite database
+samples.db:
+	test T${HAVE_SQLITE} = TFalse || \
+	sqlite3 $@ < db/samples/sqlite/create-ado-sqlite.sql
+
+# Create the tables in the database.
+# (The database itself must have been created)
+create-mysql-tests:
+	-test T${HAVE_MYSQL} = TFalse || \
+	mysql --defaults-extra-file=db/regtests/mysql/mysql.cnf < db/regtests/mysql/drop-ado-mysql.sql
+	test T${HAVE_MYSQL} = TFalse || \
+	mysql --defaults-extra-file=db/regtests/mysql/mysql.cnf < db/regtests/mysql/create-ado-mysql.sql
+
+# Files to package in source distribution
+DISTFILES=README LICENSE.txt NOTICE.txt CHANGES ChangeLog NEWS config.guess configure config.sub \
+configure.in Makefile.in install-sh \
+ado.gpr.in tests.gpr.in samples.gpr.in config.gpr \
+src samples regtests db win32 \
+distrib test-mysql.properties test-sqlite.properties dynamo.xml
+
+dist:
+	-rm -rf $(distdir)
+	mkdir $(distdir)
+	-chmod 777 $(distdir)
+	here=`cd $(top_builddir) && pwd`; \
+	top_distdir=`cd $(distdir) && pwd`; \
+	distdir=`cd $(distdir) && pwd`; \
+	for file in $(DISTFILES); do \
+	  d=$(srcdir); \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
+	done
+	mkdir $(distdir)/bin
+	mkdir $(distdir)/obj
+	mkdir $(distdir)/lib
+	tar --exclude=.svn --exclude="*~" --exclude="*.o" --exclude="*.ali" \
+	    --exclude="*.log" --exclude="*.a" \
+	    -cvzf $(DIST_FILE) $(distdir)
+
+install:
+	$(MKDIR) -p ${includedir}/ado
+	$(MKDIR) -p ${projectdir}/
+	${MKDIR} -p ${alidir}/ado
+	${MKDIR} -p ${dynamodir}/ado/db
+	${MKDIR} -p ${dynamodir}/ado/db/mysql
+	${MKDIR} -p ${dynamodir}/ado/db/sqlite
+	${CP} src/*.ad[bs] ${includedir}/ado
+	test T${HAVE_MYSQL} = TTrue && ${CP} ${mysql_src_dir}/*.ad[bs] ${includedir}/ado
+	test T${HAVE_SQLITE} = TTrue && ${CP} ${sqlite_src_dir}/*.ad[bs] ${includedir}/ado
+	${CP} src/model/*.ad[bs] ${includedir}/ado
+	sed -e "s,INSTALL,${prefix},g" < distrib/ado.gpr > ${projectdir}/ado.gpr
+	${CP} db/*.xml ${dynamodir}/ado/db/
+	${CP} db/mysql/*.sql ${dynamodir}/ado/db/mysql
+	${CP} db/sqlite/*.sql ${dynamodir}/ado/db/sqlite
+	${CP} lib/ado/*.ali ${alidir}/ado
+	${CP} lib/ado/libadaado.a ${libdir}/
+
+
+uninstall:
+	rm -rf ${includedir}/ado
+	rm -f ${libdir}/libadaado.a
+	rm -f ${projectdir}/ado.gpr
+
+# prepare before releasing a new version of the package
+# (collect information about changes and SVN repository)
+prepare-release:
+	${SVN} update
+	${SVN} info > CHANGES
+	${SVN} log -v > ChangeLog
