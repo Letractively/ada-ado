@@ -213,5 +213,6 @@ are removed and replaced by the query result.
 
 == References ==
 
+[SimpleMappingExample Simple Mapping Example]
 
 [http://code.google.com/p/ada-ado/source/browse/trunk/samples/add_user.adb add_user.adb]
