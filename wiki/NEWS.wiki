@@ -1,0 +1,18 @@
+
+=== Version 0.4.0   - Feb 2013 ===
+  * Fix support to reload query definitions
+  * Optimize session factory implementation
+  * Customize the MySQL database connection by using MySQL SET
+
+=== Version 0.3.0   - May 2012 ===
+  * Support to update database records when a field is really modified
+  * Customize the SQLite database connection by using SQLite PRAGMAs
+  * Escape MySQL or SQLite reserved keywords
+  * Support for blob type
+
+=== Version 0.2.0   - Aug 2011 ===
+  * Port on Windows
+
+=== Version 0.1.0   - May 2011 ===
+  * ADO model with Mysql driver
+  * ADO model with SQLite driver
